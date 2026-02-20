@@ -1,10 +1,32 @@
-const { json } = require("body-parser");
 const express = require("express");
+const mongoose = require("mongoose");
+const User = require("./models/user.model");
+
 const app = express();
-const port = 5000;
+app.use(express.json());
 
-app.use(express(json()));
+app.get("/", (req, res) => res.send("Server Working ✅"));
 
-app.listen(port, () => {
-	console.log("App is up and running on port", port);
+app.post("/users", async (req, res) => {
+  try {
+    const user = await User.create(req.body);
+    res.status(201).json(user);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 });
+
+const startServer = async () => {
+  try {
+    await mongoose.connect("mongodb://127.0.0.1:27017/GSMS");
+    console.log("MongoDB Connected");
+
+    app.listen(5000, () => {
+      console.log("Server running on port 5000");
+    });
+  } catch (error) {
+    console.log("DB Connection Error:", error.message);
+  }
+};
+
+startServer();
