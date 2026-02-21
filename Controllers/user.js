@@ -1,0 +1,116 @@
+const User = require("../models/user.model.js");
+const { StatusCodes } = require('http-status-codes');
+
+// To Register Admin/User
+const register = async (req, res) => {
+   
+    const { firstName, lastName, email, password, confirmpassword, role} = req.body;
+
+   
+    if (!firstName || !lastName || !email || !password ||!confirmpassword) {
+        return res.status(400).json({ msg: "Please provide all required fields" });
+    }
+
+    if (password !== confirmpassword) {
+    return res.status(400).json({ msg: "Passwords do not match. Please try again!" });
+}
+   
+    if (role === "admin") {
+        const isAdminExist = await User.findOne({ role: "admin" });
+        if (isAdminExist) {
+            return res.status(403).json({
+                msg: "Admin already exists.",
+            });
+        }
+    }
+
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            msg: "Email already exists.",
+        });
+    }
+    
+
+    
+    const user = await User.create({
+        firstName,
+        lastName,
+        email: email.toLowerCase(),
+        password,
+       
+        role: role || "user", 
+    });
+    
+    // const token = user.createJWT();
+
+    
+    // res.status(StatusCodes.CREATED).json({
+    //     user: {
+    //         _id: user._id,
+    //         name: `${user.firstName} ${user.lastName}`,
+    //         role: user.role,
+    //     },
+    //     token,
+    // });
+};
+
+// To Login Admin/User
+const login = async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password ) {
+        throw new BadRequestError("Please provide email and password");
+    }
+
+    const user = await User.findOne({
+        email: email.toLowerCase(),
+    }).select("+password");
+
+    if (!user) {
+        throw new UnauthenticatedError("Invalid Credentials");
+    }
+
+    const isPasswordCorrect = await user.comparePassword(password);
+    if (!isPasswordCorrect) {
+        throw new UnauthenticatedError("Invalid Credentials");
+    }
+
+    // const token = user.createJWT();
+
+    // res.status(StatusCodes.OK).json({
+    //     user: {
+    //         _id: user._id,
+    //         firstName: user.firstName,
+    //         lastName: user.lastName,
+    //         email: user.email,
+    //         role: user.role,
+    //     },
+    //     token,
+    // });
+};
+
+//Get all users
+const getAllUsers = async (req, res) => {
+  
+    const users = await User.find({}).select("-password");
+    res.status(200).json({
+        count: users.length,
+        users,
+    });
+};
+
+// Delete a user by ID
+const deleteUser = async (req, res) => {
+    const { id } = req.params;
+    const user = await User.findByIdAndDelete(id);
+    if (!user) {
+        return res.status(404).json({ msg: `No user found with id: ${id}` });
+    }
+    res.status(200).json({ msg: "Success! User removed from the system." });
+};
+module.exports = { 
+    register,
+    login,
+    getAllUsers,
+    deleteUser };
