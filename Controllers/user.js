@@ -60,7 +60,7 @@ const login = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password ) {
-        throw new BadRequestError("Please provide email and password");
+        return res.status(400).json({ msg: "Please provide email and password" });
     }
 
     const user = await User.findOne({
@@ -68,12 +68,12 @@ const login = async (req, res) => {
     }).select("+password");
 
     if (!user) {
-        throw new UnauthenticatedError("Invalid Credentials");
+       return res.status(400).json({ msg: "Invalid Credentials" });
     }
 
     const isPasswordCorrect = await user.comparePassword(password);
     if (!isPasswordCorrect) {
-        throw new UnauthenticatedError("Invalid Credentials");
+       return res.status(400).json({ msg: "Invalid Credentials" });
     }
 
     // const token = user.createJWT();
