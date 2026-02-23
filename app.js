@@ -1,9 +1,15 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 const User = require("./models/user.model.js");
 const userRoutes = require("./routes/userRoutes.js");
 
 const app = express();
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  }),
+);
 app.use(express.json());
 app.use("/api/v1/users", userRoutes);
 
