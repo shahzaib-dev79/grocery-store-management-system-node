@@ -71,9 +71,8 @@ const login = async (req, res) => {
     if (!email || !password || !role) {
       return res
         .status(400)
-        .json({ message: "Please provide email and password" });
+        .json({ message: "Please provide email, password and role" });
     }
-    console.log();
     const user = await User.findOne({
       email: email.toLowerCase(),
     }).select("+password");
@@ -88,7 +87,7 @@ const login = async (req, res) => {
     }
 
     res.status(StatusCodes.OK).json({
-      msg: "Login successful",
+      msg: "Login successfully",
       user: {
         _id: user._id,
         firstName: user.firstName,
