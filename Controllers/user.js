@@ -20,14 +20,14 @@ const register = async (req, res) => {
         .json({ msg: "Passwords do not match. Please try again!" });
     }
 
-    if (role === "admin") {
-      const isAdminExist = await User.findOne({ role: "admin" });
-      if (isAdminExist) {
-        return res.status(403).json({
-          msg: "Admin already exists.",
-        });
-      }
-    }
+    // if (role === "admin") {
+    //   const isAdminExist = await User.findOne({ role: "admin" });
+    //   if (isAdminExist) {
+    //     return res.status(403).json({
+    //       msg: "Admin already exists.",
+    //     });
+    //   }
+    // }
 
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
@@ -42,6 +42,9 @@ const register = async (req, res) => {
       email: email.toLowerCase(),
       password: hashedPassword,
       role: role || "cashier",
+    });
+    res.status(StatusCodes.CREATED).json({
+      msg: "User registered successfully",
     });
   } catch (error) {
     console.error(error);
@@ -62,38 +65,52 @@ const register = async (req, res) => {
 
 // To Login Admin/User
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password, role } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ msg: "Please provide email and password" });
+    if (!email || !password || !role) {
+      return res.status(400).json({ msg: "Please provide email and password" });
+    }
+
+    const user = await User.findOne({
+      email: email.toLowerCase(),
+    }).select("+password");
+
+    if (!user) {
+      return res.status(400).json({ msg: "Invalid Credentials" });
+    }
+
+    const isPasswordCorrect = await user.comparePassword(password);
+    if (!isPasswordCorrect) {
+      return res.status(400).json({ msg: "Invalid Credentials" });
+    }
+
+    res.status(StatusCodes.OK).json({
+      msg: "Login successful",
+      user: {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ msg: "Server error" });
   }
-
-  const user = await User.findOne({
-    email: email.toLowerCase(),
-  }).select("+password");
-
-  if (!user) {
-    return res.status(400).json({ msg: "Invalid Credentials" });
-  }
-
-  const isPasswordCorrect = await user.comparePassword(password);
-  if (!isPasswordCorrect) {
-    return res.status(400).json({ msg: "Invalid Credentials" });
-  }
-
-  // const token = user.createJWT();
-
-  // res.status(StatusCodes.OK).json({
-  //     user: {
-  //         _id: user._id,
-  //         firstName: user.firstName,
-  //         lastName: user.lastName,
-  //         email: user.email,
-  //         role: user.role,
-  //     },
-  //     token,
-  // });
 };
+// const token = user.createJWT();
+
+// res.status(StatusCodes.OK).json({
+//     user: {
+//         _id: user._id,
+//         firstName: user.firstName,
+//         lastName: user.lastName,
+//         email: user.email,
+//         role: user.role,
+//     },
+//     token,
+// });
 
 //Get all users
 const getAllUsers = async (req, res) => {
