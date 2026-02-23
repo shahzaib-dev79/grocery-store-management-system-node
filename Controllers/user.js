@@ -73,7 +73,7 @@ const login = async (req, res) => {
         .status(400)
         .json({ message: "Please provide email and password" });
     }
-
+    console.log();
     const user = await User.findOne({
       email: email.toLowerCase(),
     }).select("+password");
