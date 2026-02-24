@@ -41,7 +41,7 @@ const register = async (req, res) => {
       lastName,
       email: email.toLowerCase(),
       password: hashedPassword,
-      role: role || "cashier",
+      role: role || "user",
     });
     res.status(StatusCodes.CREATED).json({
       msg: "User registered successfully",
@@ -71,22 +71,32 @@ const login = async (req, res) => {
     if (!email || !password || !role) {
       return res
         .status(400)
-        .json({ message: "Please provide email, password and role" });
+        .json({ message: "Please provide email, role and password" });
     }
     const user = await User.findOne({
       email: email.toLowerCase(),
-    }).select("+password");
+    });
+
+    console.log("User Found", user);
 
     if (!user) {
       return res.status(400).json({ message: "Invalid Credentials" });
     }
 
     const isPasswordCorrect = await user.comparePassword(password);
+
+    console.log("Password Match,", isPasswordCorrect);
     if (!isPasswordCorrect) {
       return res.status(400).json({ msg: "Invalid Credentials" });
     }
 
-    res.status(StatusCodes.OK).json({
+    if (user.role !== role) {
+      return res.status(400).json({ msg: "Invalid role selected" });
+    }
+    console.log("Entered Password:", password);
+    console.log("DB Password:", user.password);
+
+    res.status(200).json({
       msg: "Login successfully",
       user: {
         _id: user._id,
@@ -97,6 +107,7 @@ const login = async (req, res) => {
       },
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ msg: "Server error" });
   }
 };
