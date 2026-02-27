@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const User = require("./models/user.model.js");
 const userRoutes = require("./routes/userRoutes.js");
-
+const inventoryRoutes = require("./routes/inventoryroutes.js");
 const app = express();
 app.use(
   cors({
@@ -12,9 +12,8 @@ app.use(
 );
 app.use(express.json());
 app.use("/api/v1/users", userRoutes);
-
 app.get("/", (req, res) => res.send("Server Working ✅"));
-
+app.use("/api/inventory", inventoryRoutes);
 app.post("/users", async (req, res) => {
   try {
     const user = await User.create(req.body);
