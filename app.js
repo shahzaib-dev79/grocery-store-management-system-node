@@ -7,6 +7,7 @@ const Cart = require("./models/cart.js");
 
 const CartRoutes = require("./routes/cart.js");
 const userRoutes = require("./routes/userRoutes.js");
+const orderRoutes = require("./routes/orderRoutes.js");
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(express.json());
 
 app.use("/api/v1/cart", CartRoutes);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/orders", orderRoutes);
 
 app.get("/", (req, res) => res.send("Server Working ✅"));
 
