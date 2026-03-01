@@ -7,7 +7,7 @@ const Cart = require("./models/cart.js");
 
 const CartRoutes = require("./routes/cart.js");
 const userRoutes = require("./routes/userRoutes.js");
-
+const wishlistRoutes = require("./routes/wishlistRoutes");
 const app = express();
 
 app.use(
@@ -30,7 +30,7 @@ app.post("/users", async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
-
+app.use("/api/wishlist", wishlistRoutes);
 const startServer = async () => {
   try {
     await mongoose.connect("mongodb://127.0.0.1:27017/GSMS");
