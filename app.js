@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const cors = require("cors");
+const User = require("./models/user.model");
+const authRoutes = require("./routes/auth");
+const cartRoutes = require("./routes/cartRoutes");
 
 const User = require("./models/user.model.js");
 const Cart = require("./models/cart.js");
@@ -21,6 +23,8 @@ app.use(express.json());
 app.use("/api/v1/cart", CartRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/orders", orderRoutes);
+// Auth routes
+app.use("/auth", authRoutes);
 
 app.get("/", (req, res) => res.send("Server Working ✅"));
 
