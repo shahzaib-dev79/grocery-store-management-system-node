@@ -26,10 +26,19 @@ const supplierSchema = new mongoose.Schema(
             ref: 'Product',
         },
     ],
+    type: {
+        type: String,
+        enum: ['local', 'international', 'wholesale', 'retail', 'manufacturer'],
+        required: [true, 'Supplier type is required'],  
     },
-    {
-        timestamps: true,
+        status: {
+        type: String,
+        enum: ['active', 'inactive', 'pending'],
+        default: 'active',
     },
-);
+    },
+    { timestamps: true }
+)
+
 
 module.exports = mongoose.model('Supplier', supplierSchema);
