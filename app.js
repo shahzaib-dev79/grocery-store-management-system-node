@@ -1,9 +1,15 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const User = require("./models/user.model");
+const authRoutes = require("./routes/auth");
+const cartRoutes = require("./routes/cartRoutes");
+
 
 const app = express();
 app.use(express.json());
+
+// Auth routes
+app.use("/auth", authRoutes);
 
 app.get("/", (req, res) => res.send("Server Working ✅"));
 
