@@ -12,6 +12,8 @@ const wishlistRoutes = require("./routes/wishList.js");
 const inventoryRoutes = require("./routes/inventoryroutes.js");
 const productRoutes = require("./routes/productRoutes.js");
 const orderRoutes = require("./routes/orderRoutes.js");
+const supplierRoutes = require("./routes/supplierRoutes.js");
+
 
 const app = express();
 
@@ -23,6 +25,7 @@ app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/orders", orderRoutes);
 app.use("/auth", authRoutes);
+app.use("/api/v1/suppliers", supplierRoutes);
 
 app.get("/", (req, res) => res.send("Server Working ✅"));
 app.use("/api/inventory", inventoryRoutes);
