@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -7,6 +8,7 @@ const Cart = require("./models/cart.js");
 
 const CartRoutes = require("./routes/cart.js");
 const userRoutes = require("./routes/userRoutes.js");
+const productRoutes = require("./routes/productRoutes.js");
 
 const app = express();
 
@@ -19,6 +21,7 @@ app.use(express.json());
 
 app.use("/api/v1/cart", CartRoutes);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/products", productRoutes);
 
 app.get("/", (req, res) => res.send("Server Working ✅"));
 
