@@ -1,8 +1,8 @@
-const Cart = require("../models/card");
+const Card = require("../models/card");
 
 exports.addToCart = async (req, res) => {
   try {
-    const cartItem = await Cart.create(req.body);
+    const cartItem = await Card.create(req.body);
     res.status(201).json(cartItem);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -11,7 +11,7 @@ exports.addToCart = async (req, res) => {
 
 exports.getCartItems = async (req, res) => {
   try {
-    const cartItems = await Cart.find();
+    const cartItems = await Card.find();
     res.status(200).json(cartItems);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -19,7 +19,7 @@ exports.getCartItems = async (req, res) => {
 };
 
 exports.updateCartItem = async (req, res) => {
-  const updatedCartItem = await Cart.findByIdAndUpdate(
+  const updatedCartItem = await Card.findByIdAndUpdate(
     req.params.id,
     req.body,
     { new: true },
