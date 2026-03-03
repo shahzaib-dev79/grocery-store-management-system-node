@@ -1,7 +1,8 @@
 const User = require("../models/user.model.js");
 const { StatusCodes } = require("http-status-codes");
 const bcrypt = require("bcrypt");
-
+const jwt = require("jsonwebtoken");
+const JWT_SECRET = process.env.JWT_SECRET;
 // To Register Admin/User
 const register = async (req, res) => {
   try {
@@ -43,8 +44,22 @@ const register = async (req, res) => {
       password: hashedPassword,
       role: role || "user",
     });
-    res.status(StatusCodes.CREATED).json({
+    const token = jwt.sign(
+      { id: user._id, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: "1d" },
+    );
+    res.status(201).json({
+      success: true,
       msg: "User registered successfully",
+      token,
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (error) {
     console.error(error);
@@ -91,11 +106,14 @@ const login = async (req, res) => {
     if (user.role !== role) {
       return res.status(400).json({ msg: "Invalid role selected" });
     }
-    console.log("Entered Password:", password);
-    console.log("DB Password:", user.password);
-
+    const token = jwt.sign(
+      { id: user._id, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: "1d" },
+    );
     res.status(200).json({
       msg: "Login successfully",
+      token,
       user: {
         _id: user._id,
         firstName: user.firstName,

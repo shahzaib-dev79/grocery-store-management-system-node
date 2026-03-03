@@ -1,8 +1,6 @@
 
 const Wishlist = require("../models/wishList");
 
-
-
 const addToWishlist = async (req, res) => {
   try {
     const { productId } = req.body;
@@ -37,9 +35,6 @@ const addToWishlist = async (req, res) => {
   }
 };
 
-
-
-
 const getWishlist = async (req, res) => {
   try {
     const list = await Wishlist.find({ user: req.user.userId })
@@ -59,9 +54,6 @@ const getWishlist = async (req, res) => {
     });
   }
 };
-
-
-
 
 const removeFromWishlist = async (req, res) => {
   try {
@@ -92,12 +84,9 @@ const removeFromWishlist = async (req, res) => {
   }
 };
 
-
-
-
 const clearWishlist = async (req, res) => {
-  try {
-    await Wishlist.deleteMany({ user: req.user.userId });
+	try {
+		await Wishlist.deleteMany({ user: req.user.userId });
 
      res.status(200).json({
       success: true,
@@ -112,8 +101,8 @@ const clearWishlist = async (req, res) => {
   }
 };
 module.exports = {
-  addToWishlist,
-  getWishlist,
-  removeFromWishlist,
-  clearWishlist,
+	addToWishlist,
+	getWishlist,
+	removeFromWishlist,
+	clearWishlist,
 };
