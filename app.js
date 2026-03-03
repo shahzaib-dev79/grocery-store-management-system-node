@@ -9,6 +9,7 @@ const cardRoutes = require("./routes/card.js");
 
 const CartRoutes = require("./routes/cart.js");
 const userRoutes = require("./routes/userRoutes.js");
+const wishlistRoutes = require("./routes/wishlistRoutes");
 const inventoryRoutes = require("./routes/inventoryroutes.js");
 const productRoutes = require("./routes/productRoutes.js");
 const orderRoutes = require("./routes/orderRoutes.js");
@@ -40,7 +41,7 @@ app.post("/users", async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
-
+app.use("/api/wishlist", wishlistRoutes);
 const startServer = async () => {
   try {
     await mongoose.connect("mongodb://127.0.0.1:27017/GSMS");
