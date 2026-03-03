@@ -1,4 +1,4 @@
-const { default: mongoose } = require("mongoose");
+
 const Wishlist = require("../models/wishList");
 
 
@@ -13,7 +13,10 @@ const addToWishlist = async (req, res) => {
     });
 
     if (exists) {
-      return res.status(400).json({ msg: "Already in wishlist" });
+     return res.status(400).json({
+        success: false,
+        message: "Product already in wishlist",
+      });
     }
 
     const item = await Wishlist.create({
@@ -21,9 +24,16 @@ const addToWishlist = async (req, res) => {
       product: productId,
     });
 
-    res.status(201).json(item);
+    res.status(201).json({
+      success: true,
+      message: "Product added to wishlist successfully",
+      data: item,
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+     res.status(500).json({
+      success: false,
+      message: "Failed to add product to wishlist",
+      error: err.message, });
   }
 };
 
@@ -35,9 +45,18 @@ const getWishlist = async (req, res) => {
     const list = await Wishlist.find({ user: req.user.userId })
       .populate("product");
 
-    res.json(list);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(200).json({
+      success: true,
+      message: "Wishlist fetched successfully",
+      totalItems: list.length,
+      data: list,
+    });
+   } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch wishlist",
+      error: err.message,
+    });
   }
 };
 
@@ -54,12 +73,22 @@ const removeFromWishlist = async (req, res) => {
     });
 
     if (!deleted) {
-      return res.status(404).json({ msg: "Item not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Wishlist item not found",
+      });
     }
 
-    res.json({ msg: "Removed from wishlist" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(200).json({
+      success: true,
+      message: "Product removed from wishlist successfully",
+    });
+    } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to remove product",
+      error: err.message,
+    });
   }
 };
 
@@ -70,12 +99,18 @@ const clearWishlist = async (req, res) => {
   try {
     await Wishlist.deleteMany({ user: req.user.userId });
 
-    res.json({ msg: "Wishlist cleared" });
+     res.status(200).json({
+      success: true,
+      message: "Wishlist cleared successfully",
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({
+      success: false,
+      message: "Failed to clear wishlist",
+      error: err.message,
+    });
   }
 };
-module.exports = mongoose.model("Wishlist", wishlistSchema);
 module.exports = {
   addToWishlist,
   getWishlist,
