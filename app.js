@@ -10,6 +10,7 @@ const cardRoutes = require("./routes/card.js");
 const CartRoutes = require("./routes/cart.js");
 const userRoutes = require("./routes/userRoutes.js");
 const wishlistRoutes = require("./routes/wishlistRoutes");
+const inventoryRoutes = require("./routes/inventoryroutes.js");
 const productRoutes = require("./routes/productRoutes.js");
 const orderRoutes = require("./routes/orderRoutes.js");
 
@@ -31,7 +32,7 @@ app.use("/api/v1/orders", orderRoutes);
 app.use("/auth", authRoutes);
 
 app.get("/", (req, res) => res.send("Server Working ✅"));
-
+app.use("/api/inventory", inventoryRoutes);
 app.post("/users", async (req, res) => {
   try {
     const user = await User.create(req.body);
