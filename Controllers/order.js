@@ -1,11 +1,13 @@
 const Order = require("../models/order.model.js");
 
-//creating a new order
+// Create a new order 
 const createOrder = async (req, res) => {
   try {
-    const { customerName, items, totalAmount,} = req.body;
+    const { customerId, customerName, items, totalAmount } = req.body;
+    
     
     const newOrder = await Order.create({
+      customerId,
       customerName,
       items,
       totalAmount,
@@ -16,14 +18,71 @@ const createOrder = async (req, res) => {
     res.status(400).json({ msg: "Error creating order", error: error.message });
   }
 };
-//getting all orders
+
+// Get all orders 
 const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find().populate("receivedBy", "firstName lastName email");
+    const orders = await Order.find().populate("customerId", "firstName lastName email"); 
     res.status(200).json({ count: orders.length, orders });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-module.exports = { createOrder, getAllOrders };
+// Get Single Order 
+const getSingleOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await Order.findById(id);
+
+    if (!order) {
+      return res.status(404).json({ msg: `No order found with id: ${id}` });
+    }
+    res.status(200).json({ order });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Cancel Order 
+const cancelOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const order = await Order.findByIdAndUpdate(
+      id,
+      { status: "cancelled" }, 
+      { new: true, runValidators: true }
+    );
+
+    if (!order) {
+      return res.status(404).json({ msg: `No order found with id: ${id}` });
+    }
+    res.status(200).json({ msg: "Order has been cancelled", order });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Delete Order 
+const deleteOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await Order.findByIdAndDelete(id);
+
+    if (!order) {
+      return res.status(404).json({ msg: `No order found with id: ${id}` });
+    }
+    res.status(200).json({ msg: "Order deleted successfully from the system" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = { 
+  createOrder, 
+  getAllOrders, 
+  getSingleOrder, 
+  cancelOrder, 
+  deleteOrder 
+};
