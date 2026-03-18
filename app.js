@@ -13,7 +13,7 @@ const inventoryRoutes = require("./routes/inventoryroutes.js");
 const productRoutes = require("./routes/productRoutes.js");
 const orderRoutes = require("./routes/orderRoutes.js");
 const supplierRoutes = require("./routes/supplierRoutes.js");
-
+const dashboardRoutes = require("./routes/dashboard.js");
 
 const app = express();
 
@@ -26,29 +26,30 @@ app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/orders", orderRoutes);
 app.use("/auth", authRoutes);
 app.use("/api/v1/suppliers", supplierRoutes);
+app.use("/api/v1/dashboard", dashboardRoutes);
 
 app.get("/", (req, res) => res.send("Server Working ✅"));
 app.use("/api/inventory", inventoryRoutes);
 app.post("/users", async (req, res) => {
-	try {
-		const user = await User.create(req.body);
-		res.status(201).json(user);
-	} catch (error) {
-		res.status(400).json({ message: error.message });
-	}
+  try {
+    const user = await User.create(req.body);
+    res.status(201).json(user);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 });
 app.use("/api/wishlist", wishlistRoutes);
 const startServer = async () => {
-	try {
-		await mongoose.connect("mongodb://127.0.0.1:27017/GSMS");
-		console.log("MongoDB Connected");
+  try {
+    await mongoose.connect("mongodb://127.0.0.1:27017/GSMS");
+    console.log("MongoDB Connected");
 
-		app.listen(5000, () => {
-			console.log("Server running on port 5000");
-		});
-	} catch (error) {
-		console.log("DB Connection Error:", error.message);
-	}
+    app.listen(5000, () => {
+      console.log("Server running on port 5000");
+    });
+  } catch (error) {
+    console.log("DB Connection Error:", error.message);
+  }
 };
 
 startServer();
