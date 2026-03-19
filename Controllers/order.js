@@ -1,11 +1,11 @@
 const Order = require("../models/order.model.js");
 
-// Create a new order 
+// Create a new order
 const createOrder = async (req, res) => {
+  console.log("BODY RECEIVED:", req.body);
   try {
     const { customerId, customerName, items, totalAmount } = req.body;
-    
-    
+
     const newOrder = await Order.create({
       customerId,
       customerName,
@@ -19,17 +19,20 @@ const createOrder = async (req, res) => {
   }
 };
 
-// Get all orders 
+// Get all orders
 const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find().populate("customerId", "firstName lastName email"); 
+    const orders = await Order.find().populate(
+      "customerId",
+      "firstName lastName email",
+    );
     res.status(200).json({ count: orders.length, orders });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// Get Single Order 
+// Get Single Order
 const getSingleOrder = async (req, res) => {
   try {
     const { id } = req.params;
@@ -44,15 +47,15 @@ const getSingleOrder = async (req, res) => {
   }
 };
 
-// Cancel Order 
+// Cancel Order
 const cancelOrder = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const order = await Order.findByIdAndUpdate(
       id,
-      { status: "cancelled" }, 
-      { new: true, runValidators: true }
+      { status: "cancelled" },
+      { new: true, runValidators: true },
     );
 
     if (!order) {
@@ -64,7 +67,7 @@ const cancelOrder = async (req, res) => {
   }
 };
 
-// Delete Order 
+// Delete Order
 const deleteOrder = async (req, res) => {
   try {
     const { id } = req.params;
@@ -79,10 +82,10 @@ const deleteOrder = async (req, res) => {
   }
 };
 
-module.exports = { 
-  createOrder, 
-  getAllOrders, 
-  getSingleOrder, 
-  cancelOrder, 
-  deleteOrder 
+module.exports = {
+  createOrder,
+  getAllOrders,
+  getSingleOrder,
+  cancelOrder,
+  deleteOrder,
 };
