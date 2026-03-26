@@ -17,6 +17,7 @@ const supplierRoutes = require("./routes/supplierRoutes.js");
 const marketingRoutes = require("./routes/marketingtools.js");
 const app = express();
 
+const dashboardRoutes = require("./routes/dashboard.js");
 
 app.use(cors({
     origin: process.env.FRONTEND_URL || "http://localhost:3000",
@@ -39,6 +40,9 @@ app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/orders", orderRoutes);
 app.use("/auth", authRoutes);
 app.use("/api/v1/suppliers", supplierRoutes);
+app.use("/api/v1/dashboard", dashboardRoutes);
+
+app.get("/", (req, res) => res.send("Server Working ✅"));
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/v1/marketing", marketingRoutes);
@@ -46,12 +50,12 @@ app.use("/api/v1/marketing", marketingRoutes);
 app.get("/", (req, res) => res.send("Server Working "));
 
 app.post("/users", async (req, res) => {
-	try {
-		const user = await User.create(req.body);
-		res.status(201).json(user);
-	} catch (error) {
-		res.status(400).json({ message: error.message });
-	}
+  try {
+    const user = await User.create(req.body);
+    res.status(201).json(user);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 });
 
 const startServer = async () => {
