@@ -4,13 +4,19 @@ const Order = require("../models/order.model.js");
 const createOrder = async (req, res) => {
   console.log("BODY RECEIVED:", req.body);
   try {
-    const { customerId, customerName, items, totalAmount } = req.body;
+    const { customerId, customerName, items, totalAmount, status } = req.body;
 
     const newOrder = await Order.create({
-      customerId,
+      customerId: customerId || null,
       customerName,
-      items,
+      items: items.map((i) => ({
+        productId: i.productId || null,
+        productName: i.productName,
+        quantity: i.quantity,
+        price: i.price,
+      })),
       totalAmount,
+      status: status || "pending",
     });
 
     res.status(201).json({ msg: "Order successfully created!", newOrder });
