@@ -20,11 +20,34 @@ const getDashboardStats = async (req, res) => {
     const totalSuppliers = await Supplier.countDocuments();
     const totalCartItems = await Cart.countDocuments();
     const totalWishlistItems = await Wishlist.countDocuments();
+
     const stockAgg = await Inventory.aggregate([
       { $group: { _id: null, totalStock: { $sum: "$quantity" } } },
     ]);
     const totalStock = stockAgg[0]?.totalStock || 0;
-
+    const ordersByDay = await Order.aggregate([
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: "%Y-%m-%d",
+              date: "$createdAt",
+            },
+          },
+          totalOrders: { $sum: 1 },
+          totalRevenue: { $sum: "$totalAmount" },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+    const productsByCategory = await Product.aggregate([
+      {
+        $group: {
+          _id: "$category",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
     res.status(200).json({
       totalOrders,
       totalRevenue,
@@ -34,11 +57,14 @@ const getDashboardStats = async (req, res) => {
       totalSuppliers,
       totalCartItems,
       totalWishlistItems,
+      ordersByDay,
+      productsByCategory,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ msg: "Error fetching dashboard stats", error: error.message });
+    res.status(500).json({
+      msg: "Error fetching dashboard stats",
+      error: error.message,
+    });
   }
 };
 
