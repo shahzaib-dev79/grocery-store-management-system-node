@@ -4,14 +4,14 @@ const {
   createOrder,
   getAllOrders,
   getSingleOrder,
-  cancelOrder,
+  updateOrder,
   deleteOrder,
 } = require("../Controllers/order.js");
 
 router.post("/create", createOrder);
 router.get("/all", getAllOrders);
 router.get("/:id", getSingleOrder);
-router.put("/cancel/:id", cancelOrder);
+router.put("/update/:id", updateOrder);
 router.delete("/delete/:id", deleteOrder);
 
 module.exports = router;
