@@ -1,8 +1,6 @@
 const Order = require("../models/order.model.js");
 
-// Create a new order
 const createOrder = async (req, res) => {
-  console.log("BODY RECEIVED:", req.body);
   try {
     const { customerId, customerName, items, totalAmount, status } = req.body;
 
@@ -53,21 +51,20 @@ const getSingleOrder = async (req, res) => {
   }
 };
 
-// Cancel Order
-const cancelOrder = async (req, res) => {
+const updateOrder = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const order = await Order.findByIdAndUpdate(
-      id,
-      { status: "cancelled" },
-      { new: true, runValidators: true },
-    );
+    const updatedOrder = await Order.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
-    if (!order) {
-      return res.status(404).json({ msg: `No order found with id: ${id}` });
+    if (!updatedOrder) {
+      return res.status(404).json({ msg: "Order not found" });
     }
-    res.status(200).json({ msg: "Order has been cancelled", order });
+
+    res.status(200).json({ msg: "Order updated", updatedOrder });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -92,6 +89,6 @@ module.exports = {
   createOrder,
   getAllOrders,
   getSingleOrder,
-  cancelOrder,
+  updateOrder,
   deleteOrder,
 };
