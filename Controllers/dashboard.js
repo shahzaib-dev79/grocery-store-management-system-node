@@ -40,14 +40,42 @@ const getDashboardStats = async (req, res) => {
       },
       { $sort: { _id: 1 } },
     ]);
-    const productsByCategory = await Product.aggregate([
+    const ordersTrend = await Order.aggregate([
       {
         $group: {
-          _id: "$category",
-          count: { $sum: 1 },
+          _id: {
+            $dateToString: {
+              format: "%Y-%m-%d",
+              date: "$createdAt",
+            },
+          },
+          totalOrders: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+    const topSellingProducts = await Order.aggregate([
+      { $unwind: "$items" },
+
+      {
+        $group: {
+          _id: "$items.productName",
+          sold: { $sum: "$items.quantity" },
+        },
+      },
+
+      { $sort: { sold: -1 } },
+      { $limit: 5 },
+
+      {
+        $project: {
+          name: "$_id",
+          sold: 1,
+          _id: 0,
         },
       },
     ]);
+
     res.status(200).json({
       totalOrders,
       totalRevenue,
@@ -57,14 +85,16 @@ const getDashboardStats = async (req, res) => {
       totalSuppliers,
       totalCartItems,
       totalWishlistItems,
+      ordersTrend,
       ordersByDay,
-      productsByCategory,
+      topSellingProducts,
     });
   } catch (error) {
     res.status(500).json({
       msg: "Error fetching dashboard stats",
       error: error.message,
     });
+    console.log(topSellingProducts);
   }
 };
 
