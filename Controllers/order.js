@@ -1,9 +1,25 @@
 const Order = require("../models/order.model.js");
+const Product = require("../models/Productmodel.js");
 
 const createOrder = async (req, res) => {
   try {
     const { customerId, customerName, items, totalAmount, status } = req.body;
 
+    for (let item of items) {
+      const product = await Product.findById(item.productId);
+
+      if (!product) {
+        return res.status(404).json({
+          msg: `Product not found: ${item.productName}`,
+        });
+      }
+
+      if (product.stock < item.quantity) {
+        return res.status(400).json({
+          msg: `Insufficient stock for ${product.name}`,
+        });
+      }
+    }
     const newOrder = await Order.create({
       customerId: customerId || null,
       customerName,
@@ -17,13 +33,24 @@ const createOrder = async (req, res) => {
       status: status || "pending",
     });
 
-    res.status(201).json({ msg: "Order successfully created!", newOrder });
+    for (let item of items) {
+      await Product.findByIdAndUpdate(item.productId, {
+        $inc: { stock: -item.quantity },
+      });
+    }
+
+    res.status(201).json({
+      msg: "Order successfully created!",
+      newOrder,
+    });
   } catch (error) {
-    res.status(400).json({ msg: "Error creating order", error: error.message });
+    res.status(400).json({
+      msg: "Error creating order",
+      error: error.message,
+    });
   }
 };
 
-// Get all orders
 const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find().populate(
@@ -36,7 +63,6 @@ const getAllOrders = async (req, res) => {
   }
 };
 
-// Get Single Order
 const getSingleOrder = async (req, res) => {
   try {
     const { id } = req.params;
@@ -70,7 +96,6 @@ const updateOrder = async (req, res) => {
   }
 };
 
-// Delete Order
 const deleteOrder = async (req, res) => {
   try {
     const { id } = req.params;
